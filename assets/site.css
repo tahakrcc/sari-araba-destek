@@ -1,0 +1,596 @@
+/* ===========================================================================
+   Sarı Araba — tanıtım sitesi
+   Marka renkleri ve köşe yarıçapları uygulamanın kendi tasarım sisteminden
+   gelir (constants/theme.ts). Sayfa, oyunun kendi dilini konuşur: ilan
+   kartları, plaka, piyasa şeridi ve ekspertiz şeması.
+   =========================================================================== */
+
+:root {
+  /* Nötrler sarıya doğru hafifçe kaydırılmış — düz gri değil, kağıt tonu. */
+  --ground: #f4f2ec;
+  --surface: #ffffff;
+  --surface-alt: #faf8f3;
+  --ink: #14141a;
+  --ink-soft: #2b2b33;
+  --body: #3c3b35;
+  --muted: #6d6b63;
+  --faint: #97948b;
+  --line: #dedad0;
+  --line-strong: #c3bfb2;
+
+  --sari: #ffd21c;
+  --sari-deep: #d8a900;
+  --mavi: #23688f;
+  --mavi-deep: #17516f;
+  --yesil: #17815e;
+  --turuncu: #d98324;
+  --kirmizi: #cf4444;
+
+  --r-sm: 3px;
+  --r-md: 6px;
+  --r-lg: 10px;
+
+  --step--2: 0.72rem;
+  --step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.85rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.08rem);
+  --step-1: clamp(1.18rem, 1.1rem + 0.4vw, 1.4rem);
+  --step-2: clamp(1.5rem, 1.3rem + 1vw, 2.1rem);
+  --step-3: clamp(2.1rem, 1.6rem + 2.4vw, 3.4rem);
+  --step-4: clamp(2.9rem, 1.9rem + 4.6vw, 6rem);
+
+  --shell: 1120px;
+  --pad: clamp(1.15rem, 4vw, 2.5rem);
+
+  /* Sahne renkleri temaya göre DEĞİŞMEZ: üst şerit, piyasa şeridi ve ekspertiz
+     bölümü her iki temada da koyu kalır. Marka logosu sarı harflerle koyu zemin
+     için çizilmiştir ve ekspertiz şeması koyu zeminde okunacak şekilde ayarlıdır. */
+  --stage: #14141a;
+  --stage-2: #1b1b22;
+  --stage-line: #2e2e37;
+  --stage-text: #c9c5bb;
+  --stage-text-strong: #f0ede5;
+  --stage-text-dim: #8b8880;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101216;
+    --surface: #181b21;
+    --surface-alt: #14171c;
+    --ink: #f0ede5;
+    --ink-soft: #d6d2c8;
+    --body: #c5c2b9;
+    --muted: #918e86;
+    --faint: #6f6c65;
+    --line: #282c34;
+    --line-strong: #3a3f49;
+    --sari: #ffd21c;
+    --sari-deep: #f5c500;
+    --mavi: #57a3cd;
+    --mavi-deep: #3585b1;
+    --yesil: #45c095;
+    --turuncu: #e8a049;
+    --kirmizi: #e46a6a;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #101216;
+  --surface: #181b21;
+  --surface-alt: #14171c;
+  --ink: #f0ede5;
+  --ink-soft: #d6d2c8;
+  --body: #c5c2b9;
+  --muted: #918e86;
+  --faint: #6f6c65;
+  --line: #282c34;
+  --line-strong: #3a3f49;
+  --sari: #ffd21c;
+  --sari-deep: #f5c500;
+  --mavi: #57a3cd;
+  --mavi-deep: #3585b1;
+  --yesil: #45c095;
+  --turuncu: #e8a049;
+  --kirmizi: #e46a6a;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--body);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: var(--step-0);
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 { margin: 0; color: var(--ink); text-wrap: balance; }
+p { margin: 0; }
+img { max-width: 100%; display: block; }
+ul { margin: 0; padding: 0; }
+
+/* Anton yalnızca büyük başlıklarda: dar, yüksek kontrastlı, ilan afişi karakteri. */
+.display {
+  font-family: Anton, "Archivo Black", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+
+a { color: var(--mavi); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { color: var(--mavi-deep); }
+
+:focus-visible { outline: 3px solid var(--mavi); outline-offset: 3px; border-radius: var(--r-sm); }
+
+.shell { width: min(100% - calc(var(--pad) * 2), var(--shell)); margin-inline: auto; }
+
+.mono {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.tag {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ——————————————————————— Üst şerit ——————————————————————— */
+/* Logo sarı harflerle koyu zemin için çizilmiş; şerit her iki temada koyu kalır. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(20, 20, 26, 0.94); /* sabit koyu: logo sarı harfli */
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 210, 28, 0.22);
+}
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.65rem;
+}
+.topbar img { height: 32px; width: auto; }
+.topbar nav { display: flex; gap: 1.4rem; align-items: center; font-size: 0.9rem; font-weight: 500; }
+.topbar nav a { color: #cfccc3; text-decoration: none; }
+.topbar nav a:hover { color: var(--sari); }
+@media (max-width: 700px) { .topbar nav .hide-sm { display: none; } }
+
+/* ——————————————————————— Hero ——————————————————————— */
+.hero {
+  position: relative;
+  background: var(--sari);
+  padding-block: clamp(2.75rem, 7vw, 5.5rem);
+  overflow: hidden;
+}
+/* Zemin dokusu: ilan sayfası kılavuz çizgileri. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(20, 20, 26, 0.05) 1px, transparent 1px);
+  background-size: 100% 2.25rem;
+  pointer-events: none;
+}
+.hero .shell { position: relative; display: grid; gap: clamp(2.25rem, 5vw, 4rem); }
+@media (min-width: 940px) { .hero .shell { grid-template-columns: 1.1fr 0.9fr; align-items: center; } }
+
+.hero-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 1.25rem; }
+.hero .tag { color: #7a6410; }
+.hero h1 { color: #14141a; font-size: var(--step-4); }
+.hero h1 em { font-style: normal; color: var(--mavi-deep); }
+.hero .lede { color: #453c1c; font-size: var(--step-1); max-width: 36ch; line-height: 1.5; }
+
+.plate {
+  display: inline-flex;
+  border: 2px solid #14141a;
+  border-radius: var(--r-sm);
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 3px 3px 0 rgba(20, 20, 26, 0.3);
+}
+.plate .eu {
+  background: var(--mavi-deep);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.35rem 0.5rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+}
+.plate .no {
+  color: #14141a;
+  padding: 0.35rem 0.9rem;
+  font-family: Anton, sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.14em;
+  display: flex;
+  align-items: center;
+}
+
+/* Mağaza butonları */
+.stores { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+.store {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: #14141a;
+  color: #fff;
+  border: 2px solid #14141a;
+  border-radius: var(--r-md);
+  padding: 0.6rem 1.1rem;
+  text-decoration: none;
+  min-width: 200px;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.store:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 6px 0 rgba(20, 20, 26, 0.22); }
+.store svg { flex: none; }
+.store-copy { display: flex; flex-direction: column; line-height: 1.15; }
+.store-copy small {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.store-copy strong { font-family: Anton, sans-serif; font-size: 1.05rem; font-weight: 400; letter-spacing: 0.02em; }
+.store[aria-disabled="true"] {
+  background: transparent;
+  color: #14141a;
+  border-style: dashed;
+  border-color: rgba(20, 20, 26, 0.4);
+  cursor: default;
+}
+.store[aria-disabled="true"]:hover { transform: none; box-shadow: none; color: #14141a; }
+.hero .soon { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #7a6410; }
+@media (prefers-reduced-motion: reduce) { .store { transition: none; } }
+
+/* Telefon: canlı ilan akışı */
+.device {
+  justify-self: center;
+  width: min(100%, 310px);
+  background: #14141a;
+  border-radius: 32px;
+  padding: 9px;
+  box-shadow: 0 26px 60px rgba(20, 20, 26, 0.35);
+}
+.device-screen { background: var(--surface-alt); border-radius: 24px; overflow: hidden; }
+.device-head {
+  background: #14141a;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 2px solid var(--sari);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.device-head img { height: 21px; width: auto; }
+.device-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: #d6d2c8;
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; background: #3ddc9a; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.feed { height: 340px; overflow: hidden; position: relative; }
+.feed::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 56px;
+  background: linear-gradient(transparent, var(--surface-alt));
+  pointer-events: none;
+}
+.feed-track { display: grid; gap: 0.55rem; padding: 0.7rem; animation: scroll-feed 26s linear infinite; }
+@keyframes scroll-feed { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+
+.mini {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 0.6rem 0.7rem;
+  display: grid;
+  gap: 0.25rem;
+}
+.mini-top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.mini-title { font-weight: 600; font-size: 0.84rem; color: var(--ink); }
+.mini-price { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 0.82rem; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.mini-meta { font-size: 0.68rem; color: var(--muted); }
+.mini-badges { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.2rem; }
+
+.chip {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.38rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.chip.gold { background: var(--sari); border-color: var(--sari-deep); color: #14141a; font-weight: 600; }
+.chip.blue { background: color-mix(in srgb, var(--mavi) 15%, transparent); border-color: color-mix(in srgb, var(--mavi) 45%, transparent); color: var(--mavi); font-weight: 600; }
+
+/* ——————————————————————— Piyasa şeridi ——————————————————————— */
+.ticker {
+  background: var(--stage);
+  border-block: 2px solid var(--sari);
+  overflow: hidden;
+  padding-block: 0.55rem;
+}
+.ticker-track {
+  display: flex;
+  gap: 2.5rem;
+  width: max-content;
+  animation: ticker 38s linear infinite;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: #b9b5aa;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.ticker b { color: var(--stage-text-strong); font-weight: 600; }
+.ticker .up { color: #3ddc9a; }
+.ticker .down { color: #ff8a8a; }
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track, .feed-track { animation: none; }
+  .feed { height: auto; }
+}
+
+/* ——————————————————————— Bölümler ——————————————————————— */
+section { padding-block: clamp(3.25rem, 8vw, 6rem); }
+.section-head { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: clamp(1.75rem, 3.5vw, 2.75rem); max-width: 62ch; }
+.section-head h2 { font-size: var(--step-3); }
+.section-head p { color: var(--muted); }
+
+.alt { background: var(--surface-alt); border-block: 1px solid var(--line); }
+
+/* Ekspertiz: sayfanın kalbi, koyu sahne */
+.dark-stage { background: var(--stage); color: var(--stage-text); }
+.dark-stage h2 { color: #fff; }
+.dark-stage .tag { color: var(--sari); }
+.dark-stage .section-head p { color: #a5a199; }
+
+.exp-grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
+@media (min-width: 900px) { .exp-grid { grid-template-columns: 1.05fr 0.95fr; } }
+
+/* Ekspertiz sahnesi: gerçek 3B araç modeli */
+.stage-viewer {
+  position: relative;
+  background:
+    radial-gradient(120% 90% at 50% 15%, #23232d 0%, var(--stage-2) 55%, #101015 100%);
+  border: 1px solid var(--stage-line);
+  border-radius: var(--r-lg);
+  padding: clamp(0.75rem, 2vw, 1.1rem);
+  overflow: hidden;
+}
+.stage-viewer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 210, 28, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 210, 28, 0.05) 1px, transparent 1px);
+  background-size: 2.25rem 2.25rem;
+  pointer-events: none;
+}
+.car-viewer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 300px;
+  background: transparent;
+  --poster-color: transparent;
+  border-radius: var(--r-md);
+}
+.viewer-badge {
+  position: absolute;
+  top: clamp(1rem, 2.5vw, 1.5rem);
+  left: clamp(1rem, 2.5vw, 1.5rem);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(20, 20, 26, 0.72);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--stage-line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--stage-text);
+  pointer-events: none;
+}
+.viewer-badge .dot { width: 6px; height: 6px; background: var(--sari); }
+.viewer-caption {
+  position: relative;
+  z-index: 1;
+  display: block;
+  text-align: center;
+  margin-top: 0.4rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--stage-text-dim);
+}
+
+.exp-readout { display: grid; gap: 0.9rem; }
+.readout-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--stage-line);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+.readout-row span:first-child { color: var(--stage-text-dim); letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.72rem; }
+.readout-row span:last-child { color: var(--stage-text-strong); font-weight: 600; }
+.readout-row.hit span:last-child { color: var(--sari); }
+.exp-note { color: #a5a199; font-size: 0.95rem; margin-top: 0.5rem; }
+#part-name { color: var(--sari); font-weight: 600; }
+
+/* Adımlar */
+.steps { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+@media (min-width: 780px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+.step { background: var(--surface); padding: clamp(1.4rem, 3vw, 2rem); display: grid; gap: 0.5rem; align-content: start; }
+.step-no {
+  font-family: Anton, sans-serif;
+  font-size: 1.05rem;
+  color: #14141a;
+  background: var(--sari);
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-sm);
+}
+.step h3 { font-size: var(--step-1); }
+.step p { color: var(--muted); font-size: 0.96rem; }
+
+/* Özellik tablosu */
+.spec { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+.spec-row { display: grid; gap: 0.3rem; padding: 1.2rem var(--pad); border-top: 1px solid var(--line); }
+.spec-row:first-child { border-top: 0; }
+@media (min-width: 760px) { .spec-row { grid-template-columns: 210px 1fr; gap: 1.75rem; align-items: start; } }
+.spec-row dt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 0.25rem;
+}
+.spec-row dd { margin: 0; color: var(--muted); }
+.spec-row dd strong { display: block; font-family: Anton, sans-serif; font-weight: 400; letter-spacing: 0.01em; color: var(--ink); font-size: var(--step-1); margin-bottom: 0.3rem; }
+
+/* İndirme şeridi */
+.band {
+  background: var(--sari);
+  border: 2px solid var(--stage);
+  border-radius: var(--r-lg);
+  padding: clamp(1.75rem, 4.5vw, 3rem);
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+}
+@media (min-width: 860px) { .band { grid-template-columns: 1.15fr auto; } }
+.band h2 { color: #14141a; font-size: var(--step-2); }
+.band p { color: #453c1c; max-width: 46ch; margin-top: 0.5rem; }
+.band .store { background: var(--stage); color: #fff; border-color: var(--stage); }
+.band .store[aria-disabled="true"] { background: transparent; color: #14141a; border-color: rgba(20, 20, 26, 0.4); }
+
+/* SSS */
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 1.05rem 1.2rem; }
+details + details { margin-top: 0.55rem; }
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 1.02rem;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-family: "IBM Plex Mono", monospace; font-size: 1.25rem; color: var(--muted); line-height: 1; }
+details[open] summary::after { content: "\2212"; }
+details p { margin-top: 0.75rem; color: var(--muted); font-size: 0.96rem; }
+
+/* Footer */
+footer { border-top: 1px solid var(--line); background: var(--surface-alt); padding-block: 2.75rem; }
+.foot-grid { display: grid; gap: 1.9rem; }
+@media (min-width: 740px) { .foot-grid { grid-template-columns: 1.5fr 1fr 1fr; } }
+.foot-brand { display: inline-block; background: #14141a; padding: 0.5rem 0.7rem; border-radius: var(--r-md); margin-bottom: 0.85rem; }
+.foot-brand img { height: 28px; width: auto; }
+footer h4 {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  margin: 0 0 0.65rem;
+}
+footer ul { list-style: none; display: grid; gap: 0.45rem; font-size: 0.93rem; }
+footer a { color: var(--body); text-decoration: none; }
+footer a:hover { color: var(--mavi); text-decoration: underline; }
+.foot-note {
+  margin-top: 2.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.8rem;
+  color: var(--faint);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  justify-content: space-between;
+}
+
+/* Yasal / içerik sayfaları */
+.doc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: clamp(1.5rem, 4vw, 3rem); }
+.doc h1 { font-size: var(--step-3); margin-bottom: 0.4rem; }
+.doc .updated { font-family: "IBM Plex Mono", monospace; font-size: var(--step--1); color: var(--muted); margin-bottom: 2rem; }
+.doc h2 { font-size: var(--step-1); margin-top: 2.25rem; margin-bottom: 0.6rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
+.doc h2:first-of-type { border-top: 0; padding-top: 0; margin-top: 1.5rem; }
+.doc p { margin-bottom: 0.9rem; max-width: 72ch; }
+.doc ul { max-width: 72ch; padding-left: 1.2rem; list-style: disc; }
+.doc li { margin-bottom: 0.5rem; }
+.notice {
+  border-left: 4px solid var(--sari);
+  background: color-mix(in srgb, var(--sari) 13%, transparent);
+  padding: 1rem 1.2rem;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  margin-bottom: 1.5rem;
+}
+.notice strong { color: var(--ink); }
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+}
+
+/* Scroll ile beliriş */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.55s ease, transform 0.55s ease; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
